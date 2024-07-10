@@ -1,8 +1,13 @@
+using ChatApplication;
+using ChatApplication.Hub;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IDictionary<string, UserRoomConnection>>(opt: IServiceProvider =>
+new Dictionary<string, UserRoomConnection>());
 
 var app = builder.Build();
 
@@ -14,13 +19,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
 
+app.UseEndpoints(endpoint =>
+{
+    endpoint.MapHub<ChatHub>(pattern: "/chat");
+})
 app.MapRazorPages();
+
 
 app.Run();
